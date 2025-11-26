@@ -1,0 +1,90 @@
+---
+- name: Atualizar certificados SSL
+  hosts: all
+  become: yes
+  vars:
+    repo_url: "https://github.com/Redeley/Atualiza_certificado.git"
+    temp_dir: "/tmp/certificados"
+    possible_paths:
+      - "/certificates/ssl"
+      - "/certificados/ssl"
+      - "/certificates/ssl24"
+      - "/certificados/ssl24"
+    files_to_copy:
+      - "bundle2025.crt"
+      - "STAR_hsprevent_com_br.private.pem"
+
+  tasks:
+    - name: Criar diretório temporário
+      file:
+        path: "{{ temp_dir }}"
+        state: directory
+
+    - name: Clonar repositório do GitHub
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ temp_dir }}"
+        version: "main"
+
+    - name: Encontrar diretório existente
+      stat:
+        path: "{{ item }}"
+      loop: "{{ possible_paths }}"
+      register: dir_check
+
+    - name: Definir diretório alvo
+      set_fact:
+        target_dir: "{{ item.item }}"
+      when: item.stat.exists
+      loop: "{{ dir_check.results }}"
+      when: item.stat.isdir
+
+    - name: Falhar se nenhum diretório encontrado
+      fail:
+        msg: "Nenhum diretório válido encontrado!"
+      when: target_dir is not defined
+
+    - name: Renomear arquivos antigos (se existirem)
+      shell: |
+        if [ -f "{{ target_dir }}/bundle2025.crt" ]; then
+          mv "{{ target_dir }}/bundle2025.crt" "{{ target_dir }}/old-bundle2025.crt"
+        fi
+        if [ -f "{{ target_dir }}/STAR_hsprevent_com_br.private.pem" ]; then
+          mv "{{ target_dir }}/STAR_hsprevent_com_br.private.pem" "{{ target_dir }}/old-STAR_hsprevent_com_br.private.pem"
+        fi
+      args:
+        executable: /bin/bash
+
+    - name: Copiar novos arquivos para diretório alvo
+      copy:
+        src: "{{ temp_dir }}/{{ item }}"
+        dest: "{{ target_dir }}/{{ item }}"
+        owner: root
+        group: root
+        mode: '0644'
+      loop: "{{ files_to_copy }}"
+
+    #Validação pós-atualização
+    - name: Validar se os novos arquivos foram copiados
+      stat:
+        path: "{{ target_dir }}/{{ item }}"
+      loop: "{{ files_to_copy }}"
+      register: new_files_check
+
+    - name: Exibir resultado da validação
+      debug:
+        msg: "Arquivo {{ item.item }} presente: {{ item.stat.exists }}"
+      loop: "{{ new_files_check.results }}"
+
+    #Reinício de serviços (ajuste conforme necessário)
+    - name: Reiniciar Nginx
+      service:
+        name: nginx
+        state: restarted
+      ignore_errors: yes
+
+    - name: Reiniciar Apache
+      service:
+        name: apache2
+        state: restarted
+      ignore_errors: yes
