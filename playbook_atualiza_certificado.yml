@@ -2,8 +2,9 @@
 - name: Script de atualização de certificados
   hosts: all
   become: yes
+  
   vars:
-    script_url: "https://github.com/Redeley/Atualiza_certificado.git/script_certificado.sh"
+    script_url: "https://github.com/Redeley/Atualiza_certificado/blob/64add0e4f27d3ab4e614705c62c810ac44bc4d86/script_certificado.sh"
     script_path: "/tmp/script_certificado.sh"
 
   tasks:
