@@ -4,18 +4,18 @@
   become: yes
   
   vars:
-    script_url: "https://github.com/Redeley/Atualiza_certificado/blob/64add0e4f27d3ab4e614705c62c810ac44bc4d86/script_certificado.sh"
-    script_path: "/tmp/script_certificado.sh"
+    script_local: "./script_certificado.sh"
+    script_remoto: "/tmp/script_certificado.sh"
 
   tasks:
-    - name: Baixar script do GitHub
-      get_url:
-        url: "{{ script_url }}"
-        dest: "{{ script_path }}"
+    - name: Copiar script para o servidor remoto
+      copy:
+        src: "{{ script_local }}"
+        dest: "{{ script_remoto }}"
         mode: '0755'
 
     - name: Executar script no servidor remoto e capturar saída
-      command: "bash {{ script_path }}"
+      command: "bash {{ script_remoto }}"
       register: script_output
       ignore_errors: yes  # opcional, se você quiser que erros no script não parem o playbook
 
