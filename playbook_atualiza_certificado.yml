@@ -3,8 +3,8 @@
   hosts: all
   become: yes
   vars:
-    script_url: "https://raw.githubusercontent.com/Redeley/Atualiza_certificado/main/atualiza_certificados.sh"
-    script_path: "/tmp/atualiza_certificados.sh"
+    script_url: "https://github.com/Redeley/Atualiza_certificado.git/script_certificado.sh"
+    script_path: "/tmp/script_certificado.sh"
 
   tasks:
     - name: Baixar script do GitHub
@@ -13,5 +13,11 @@
         dest: "{{ script_path }}"
         mode: '0755'
 
-    - name: Executar script
+    - name: Executar script no servidor remoto e capturar saída
       command: "bash {{ script_path }}"
+      register: script_output
+      ignore_errors: yes  # opcional, se você quiser que erros no script não parem o playbook
+
+    - name: Exibir saída do script na interface AWX
+      debug:
+        var: script_output.stdout_lines  
