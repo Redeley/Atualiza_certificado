@@ -1,11 +1,11 @@
 ---
-- name: Atualizar Kernel e reinstalar Kaspersky
+- name: Atualiza certificados SSL
   hosts: all
   become: yes
 
   vars:
-    script_local: "./script.sh"
-    script_remoto: "/tmp/script.sh"
+    script_local: "./script_certificado.sh"
+    script_remoto: "/tmp/script_certificado.sh"
 
   tasks:
     - name: Copiar script para o servidor remoto
