@@ -1,24 +1,17 @@
 ---
-- name: Atualiza certificados SSL
+- name: Script de atualização de certificados
   hosts: all
   become: yes
-
   vars:
-    script_local: "./script_certificado.sh"
-    script_remoto: "/tmp/script_certificado.sh"
+    script_url: "https://raw.githubusercontent.com/Redeley/Atualiza_certificado/main/atualiza_certificados.sh"
+    script_path: "/tmp/atualiza_certificados.sh"
 
   tasks:
-    - name: Copiar script para o servidor remoto
-      copy:
-        src: "{{ script_local }}"
-        dest: "{{ script_remoto }}"
+    - name: Baixar script do GitHub
+      get_url:
+        url: "{{ script_url }}"
+        dest: "{{ script_path }}"
         mode: '0755'
 
-    - name: Executar script no servidor remoto e capturar saída
-      shell: bash {{ script_remoto }}
-      register: script_output
-      ignore_errors: yes  # opcional, se você quiser que erros no script não parem o playbook
-
-    - name: Exibir saída do script na interface AWX
-      debug:
-        var: script_output.stdout_lines
+    - name: Executar script
+      command: "bash {{ script_path }}"
