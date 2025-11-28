@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # ==============================
@@ -6,8 +5,8 @@
 # Objetivo: Atualizar certificados SSL no servidor
 # ==============================
 
-# Links diretos para download dos arquivos do GitHub
-BUNDLE_URL="https://downloads.hsprevent.com.br/bundle2025.crt"
+# Links diretos para download dos arquivos
+BUNDLE_URL="https://downloads.hsprevent.com.br/bundle.crt"
 PRIVATE_URL="https://downloads.hsprevent.com.br/STAR_hsprevent_com_br.private.pem"
 
 # Diretórios possíveis
@@ -18,8 +17,8 @@ DIRS=(
     "/certificados/ssl24"
 )
 
-# Nome dos arquivos
-BUNDLE_FILE="bundle2025.crt"
+# Nome dos arquivos (mantendo bundle.crt como padrão)
+BUNDLE_FILE="bundle.crt"
 PRIVATE_FILE="STAR_hsprevent_com_br.private.pem"
 
 # Função para encontrar diretório válido
@@ -64,6 +63,17 @@ if [ -f "$TARGET_DIR/$BUNDLE_FILE" ] && [ -f "$TARGET_DIR/$PRIVATE_FILE" ]; then
 else
     echo "Erro ao atualizar certificados!"
     exit 1
+fi
+
+# Ajuste no nginx.conf (opcional, caso ainda exista referência antiga)
+NGINX_CONF="/usr/local/openresty/nginx/conf/nginx.conf"
+if [ -f "$NGINX_CONF" ]; then
+    echo "Verificando nginx.conf..."
+    # Remove referências antigas se existirem
+    sed -i 's/bundle2025\.crt/bundle.crt/g' "$NGINX_CONF"
+    echo "Substituição concluída."
+else
+    echo "Arquivo nginx.conf não encontrado em $NGINX_CONF"
 fi
 
 # Reiniciar serviços
