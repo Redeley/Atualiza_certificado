@@ -65,15 +65,27 @@ else
     exit 1
 fi
 
-# Ajuste no nginx.conf (opcional, caso ainda exista referência antiga)
-NGINX_CONF="/usr/local/openresty/nginx/conf/nginx.conf"
-if [ -f "$NGINX_CONF" ]; then
-    echo "Verificando nginx.conf..."
-    # Remove referências antigas se existirem
-    sed -i 's/bundle2025\.crt/bundle.crt/g' "$NGINX_CONF"
+
+# Ajuste no nginx.conf
+NGINX_PATHS=(
+    "/usr/local/openresty/nginx/conf/nginx.conf"
+    "/etc/nginx/nginx.conf"
+)
+
+FOUND_CONF=""
+for path in "${NGINX_PATHS[@]}"; do
+    if [ -f "$path" ]; then
+        FOUND_CONF="$path"
+        break
+    fi
+done
+
+if [ -n "$FOUND_CONF" ]; then
+    echo "Ajustando nginx.conf em $FOUND_CONF..."
+    sed -i 's/bundle2025\.crt/bundle.crt/g' "$FOUND_CONF"
     echo "Substituição concluída."
 else
-    echo "Arquivo nginx.conf não encontrado em $NGINX_CONF"
+    echo "Arquivo nginx.conf não encontrado nos caminhos padrão."
 fi
 
 # Reiniciar serviços
