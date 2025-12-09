@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# ==============================
-# Script: atualiza_certificados.sh
-# Objetivo: Atualizar certificados SSL no servidor
-# ==============================
-
 # Links diretos para download dos arquivos
 BUNDLE_URL="https://downloads.hsprevent.com.br/bundle.crt"
 PRIVATE_URL="https://downloads.hsprevent.com.br/STAR_hsprevent_com_br.private.pem"
