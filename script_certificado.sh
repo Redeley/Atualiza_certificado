@@ -15,8 +15,11 @@ DIRS=(
     "/certificados/ssl"
     "/certificates/ssl24"
     "/certificados/ssl24"
+    "/certificates/old"
+    "/certificados/old"
     "/certificates"
     "/certificados"
+    "/certificates/route"
 )
 
 # Nome dos arquivos (mantendo bundle.crt como padrão)
