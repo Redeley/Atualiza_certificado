@@ -17,7 +17,6 @@
     - name: Executar script no servidor remoto e capturar saída
       command: "bash {{ script_remoto }}"
       register: script_output
-      ignore_errors: yes  # opcional, se você quiser que erros no script não parem o playbook
 
     - name: Exibir saída do script na interface AWX
       debug:
